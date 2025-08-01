@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  real_estate_crawler:
+    container_name: real_estate_crawler
+    image: real_estate_crawler:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3300:3000"
+    restart: unless-stopped
+    networks:
+      - app-network
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./public:/app/public
+
+networks:
+  app-network:
+    driver: bridge 

@@ -10,18 +10,47 @@
 
 ## 🚀 설치 및 실행
 
-### 1. 의존성 설치
+### 로컬 개발 환경
+#### 1. 의존성 설치
 ```bash
 npm install
 ```
 
-### 2. 서버 실행
+#### 2. 서버 실행
 ```bash
 node app.js
 ```
 
-### 3. 웹 인터페이스 접속
+#### 3. 웹 인터페이스 접속
 브라우저에서 `http://localhost:3000` 접속
+
+### NAS 배포 환경
+#### 1. 초기 배포
+```bash
+# NAS에 SSH 접속
+ssh hyunchang88@125.141.20.218
+
+# real-estate-crawler 폴더로 이동
+cd /volume1/docker/real-estate-crawler
+
+# 배포 실행
+./real_estate_crawler_deploy.sh
+```
+
+#### 2. 파일 수정 후 재배포
+1. **로컬에서 파일 수정** (app.js, crawler.js, public/ 등)
+2. **FileZilla로 수정된 파일 업로드**
+   - 로컬: `C:\Users\hyunc\personal_project\real-estate-crawler\`
+   - 원격: `/volume1/docker/real-estate-crawler/`
+3. **NAS에서 재배포**
+   ```bash
+   cd /volume1/docker/real-estate-crawler
+   ./real_estate_crawler_deploy.sh
+   ```
+
+#### 3. 접속 정보
+- **URL**: http://125.141.20.218:3300
+- **API 포트**: 3300
 
 ## 📡 API 엔드포인트
 
