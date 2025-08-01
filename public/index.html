@@ -421,21 +421,196 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
             .container {
-                padding: 20px;
-                margin: 10px;
+                padding: 15px;
+                margin: 5px;
+                border-radius: 15px;
             }
 
             .header h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .header .icon {
+                font-size: 1.5rem;
+            }
+
+            .header p {
+                font-size: 1rem;
             }
 
             .button-group {
                 flex-direction: column;
+                gap: 10px;
             }
 
             .btn {
                 min-width: auto;
+                padding: 14px 20px;
+                font-size: 1rem;
+            }
+
+            .form-group label {
+                font-size: 1rem;
+            }
+
+            input[type="text"] {
+                padding: 15px 20px 15px 45px;
+                font-size: 1rem;
+            }
+
+            .input-wrapper i {
+                font-size: 1rem;
+                left: 12px;
+            }
+
+            .result {
+                padding: 15px;
+                margin-top: 20px;
+            }
+
+            .complex-info {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            .api-info {
+                padding: 15px;
+                margin-top: 20px;
+            }
+
+            .api-info h3 {
+                font-size: 1.1rem;
+            }
+
+            .api-info li {
+                font-size: 0.8rem;
+                padding: 8px;
+            }
+
+            .info-table, .property-table {
+                font-size: 0.85rem;
+            }
+
+            .info-table td, .property-table td {
+                padding: 8px 10px;
+            }
+
+            .info-table td:first-child, .property-table td:first-child {
+                width: 100px;
+                font-size: 0.8rem;
+            }
+
+            .filter-buttons {
+                margin-bottom: 15px;
+            }
+
+            .filter-btn {
+                padding: 8px 15px;
+                font-size: 0.8rem;
+                margin: 2px;
+            }
+
+            .collapsible-header {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+
+            .collapsible-content {
+                padding: 15px;
+            }
+
+            .property-item {
+                padding: 15px;
+                margin: 10px 0;
+            }
+
+            .property-item h5 {
+                font-size: 1rem;
+                margin-bottom: 10px;
+            }
+
+            .price-summary, .price-info {
+                padding: 12px;
+            }
+
+            .price-summary h5, .price-info h5 {
+                font-size: 0.9rem;
+            }
+
+            .price-summary li, .price-info li {
+                font-size: 0.8rem;
+            }
+
+            pre {
+                padding: 15px;
+                font-size: 0.75rem;
+                line-height: 1.4;
+            }
+
+            .btn-primary, .btn-secondary {
+                font-size: 0.9rem;
+                padding: 12px 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+                margin: 2px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .header p {
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+
+            input[type="text"] {
+                padding: 12px 16px 12px 40px;
+                font-size: 0.9rem;
+            }
+
+            .info-table, .property-table {
+                font-size: 0.75rem;
+            }
+
+            .info-table td, .property-table td {
+                padding: 6px 8px;
+            }
+
+            .info-table td:first-child, .property-table td:first-child {
+                width: 80px;
+                font-size: 0.7rem;
+            }
+
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 0.7rem;
+                margin: 1px;
+            }
+
+            .api-info li {
+                font-size: 0.7rem;
+                padding: 6px;
+            }
+
+            pre {
+                font-size: 0.7rem;
+                padding: 10px;
             }
         }
     </style>

@@ -16,6 +16,8 @@ services:
       - NODE_ENV=production
     volumes:
       - ./public:/app/public
+      - ./app.js:/app/app.js
+      - ./crawler.js:/app/crawler.js
 
 networks:
   app-network:

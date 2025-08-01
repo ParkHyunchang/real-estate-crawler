@@ -117,6 +117,8 @@ cd real-estate-crawler
 - 수정된 파일들만 업로드
 
 ### 3. NAS에서 재배포
+
+#### 빠른 배포 (권장)
 ```bash
 # NAS에 SSH 접속
 ssh hyunchang88@125.141.20.218
@@ -124,7 +126,13 @@ ssh hyunchang88@125.141.20.218
 # real-estate-crawler 폴더로 이동
 cd /volume1/docker/real-estate-crawler
 
-# 재배포 실행
+# 빠른 재배포 (컨테이너만 재시작)
+./quick-deploy.sh
+```
+
+#### 전체 재배포 (필요시)
+```bash
+# 전체 빌드 및 재배포
 ./real_estate_crawler_deploy.sh
 ```
 
@@ -140,6 +148,20 @@ docker-compose logs -f real_estate_crawler
 # http://125.141.20.218:3300
 ```
 
+## 배포 방법 비교
+
+### 빠른 배포 (권장)
+- **시간**: 5-10초
+- **용도**: HTML/CSS/JS 파일 수정 시
+- **명령어**: `./quick-deploy.sh`
+- **동작**: 컨테이너만 재시작
+
+### 전체 배포
+- **시간**: 2-5분
+- **용도**: package.json 변경, 새로운 의존성 추가 시
+- **명령어**: `./real_estate_crawler_deploy.sh`
+- **동작**: 이미지 재빌드 + 컨테이너 재시작
+
 ## 파일 구조
 ```
 real-estate-crawler/
@@ -148,6 +170,8 @@ real-estate-crawler/
 ├── .dockerignore          # Docker 빌드 시 제외할 파일들
 ├── build-and-package.ps1  # Windows 배포 스크립트
 ├── real_estate_crawler_deploy.sh  # Linux 배포 스크립트
+├── quick-deploy.sh        # 빠른 배포 스크립트
+├── quick-deploy.ps1       # Windows 빠른 배포 스크립트
 ├── app.js                 # 메인 애플리케이션
 ├── crawler.js             # 크롤링 로직
 ├── package.json           # Node.js 의존성
