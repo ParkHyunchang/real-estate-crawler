@@ -3,7 +3,7 @@ const axios = require('axios');
 
 async function getNaverAptComplexCode(keyword) {
   const browser = await puppeteer.launch({
-    headless: false, // 디버깅을 위해 헤드리스 모드 비활성화
+    headless: true, // false : 디버깅을 위해 헤드리스 모드 비활성화, true : 브라우저 직접 보면서 확인 불가능
     defaultViewport: { width: 1280, height: 800 },
     args: [
       '--no-sandbox',
@@ -311,7 +311,7 @@ async function getNaverAptComplexCode(keyword) {
 async function getComplexPropertyInfo(complexNo) {
   // 브라우저를 새로 시작하여 세션 유지
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true, // false : 디버깅을 위해 헤드리스 모드 비활성화, true : 브라우저 직접 보면서 확인 불가능
     defaultViewport: { width: 1280, height: 800 },
     args: [
       '--no-sandbox',

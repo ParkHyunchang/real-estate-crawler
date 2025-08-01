@@ -4,259 +4,480 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>네이버 부동산 크롤러</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #34495e;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
+        * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header .icon {
+            font-size: 2rem;
+            color: #667eea;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 1.1rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bdc3c7;
+            font-size: 1.2rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 18px 20px 18px 50px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
         input[type="text"]:focus {
-            border-color: #3498db;
+            border-color: #667eea;
             outline: none;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-        button {
-            background-color: #3498db;
-            color: white;
-            padding: 12px 24px;
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 16px 24px;
             border: none;
-            border-radius: 5px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 16px;
-            margin-right: 10px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
         }
-        button:hover {
-            background-color: #2980b9;
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
         }
-        button:disabled {
-            background-color: #bdc3c7;
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(240, 147, 251, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
             cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
         }
+
         .result {
             margin-top: 30px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            border-left: 4px solid #3498db;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            display: none;
         }
-        .error {
+
+        .result.error {
             border-left-color: #e74c3c;
-            background-color: #fdf2f2;
+            background: #fdf2f2;
         }
+
         .loading {
             text-align: center;
             color: #7f8c8d;
+            font-size: 1.1rem;
         }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .complex-info {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #90caf9;
+        }
+
+        .api-info {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border: 1px solid #ce93d8;
+        }
+
+        .api-info h3 {
+            color: #4a148c;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .api-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .api-info li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
         .property-item {
             background: white;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
         }
-        .complex-info {
-            background: #e8f4fd;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+
+        .property-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        .api-info {
-            background: #f0f0f0;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        pre {
-            background: #2c3e50;
-            color: #ecf0f1;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            white-space: pre-wrap;
-        }
-        .complex-details {
-            margin-top: 15px;
-        }
-        .info-table {
+
+        .info-table, .property-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-top: 15px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
-        .info-table td {
-            padding: 8px;
-            border: 1px solid #ddd;
+
+        .info-table td, .property-table td {
+            padding: 12px 15px;
+            border: 1px solid #e9ecef;
         }
-        .info-table td:first-child {
-            font-weight: bold;
+
+        .info-table td:first-child, .property-table td:first-child {
+            font-weight: 600;
             color: #34495e;
-            width: 150px; /* 좌측 정렬을 위한 너비 */
+            width: 150px;
+            background: #f8f9fa;
         }
+
+        .filter-buttons {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .filter-btn {
+            background: #ecf0f1;
+            color: #34495e;
+            padding: 10px 20px;
+            border: 2px solid #bdc3c7;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 5px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: #d4d4d4;
+            transform: translateY(-1px);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .collapsible-section {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            margin: 15px 0;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .collapsible-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.3s ease;
+        }
+
+        .collapsible-header:hover {
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+        }
+
+        .collapsible-content {
+            padding: 20px;
+            display: none;
+        }
+
+        .collapsible-content.show {
+            display: block;
+        }
+
+        .collapse-btn {
+            background: #6c757d;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .collapse-btn:hover {
+            background: #5a6268;
+            transform: scale(1.05);
+        }
+
+        .price-summary {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #a5d6a7;
+        }
+
+        .price-summary h5 {
+            margin: 0 0 10px 0;
+            color: #2e7d32;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .price-summary ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .price-summary li {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
         .price-info {
             margin-top: 15px;
-            padding: 10px;
-            background-color: #f0f7fd;
-            border: 1px solid #cce5ff;
-            border-radius: 5px;
+            padding: 15px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 1px solid #90caf9;
+            border-radius: 10px;
         }
+
         .price-info ul {
             list-style: none;
             padding: 0;
             margin: 0;
         }
+
         .price-info li {
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: #34495e;
+            padding: 5px 0;
         }
-        .property-list {
-            margin-top: 15px;
+
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
-        .property-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        .property-table td {
-            padding: 8px;
-            border: 1px solid #ddd;
-        }
-        .property-table td:first-child {
-            font-weight: bold;
-            color: #34495e;
-            width: 150px; /* 좌측 정렬을 위한 너비 */
-        }
-        .filter-buttons {
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .filter-btn {
-            background-color: #ecf0f1;
-            color: #34495e;
-            padding: 8px 15px;
-            border: 1px solid #bdc3c7;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 5px;
-            font-size: 14px;
-        }
-        .filter-btn:hover {
-            background-color: #d4d4d4;
-        }
-        .filter-btn.active {
-            background-color: #3498db;
-            color: white;
-            border-color: #3498db;
-        }
-        
-        /* 접기/펼치기 버튼 스타일 */
-        .collapse-btn {
-            background-color: #95a5a6;
-            color: white;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-        .collapse-btn:hover {
-            background-color: #7f8c8d;
-        }
-        
-        /* 접힌 섹션 스타일 */
-        .collapsible-section {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        .collapsible-header {
-            background-color: #f8f9fa;
-            padding: 10px 15px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #ddd;
-        }
-        .collapsible-header:hover {
-            background-color: #e9ecef;
-        }
-        .collapsible-content {
-            padding: 15px;
-            display: none;
-        }
-        .collapsible-content.show {
-            display: block;
-        }
-        
-        /* 가격 요약 스타일 */
-        .price-summary {
-            background-color: #e8f5e8;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        .price-summary h5 {
-            margin: 0 0 10px 0;
-            color: #27ae60;
-        }
-        .price-summary ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-        .price-summary li {
-            margin-bottom: 3px;
-            font-size: 14px;
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                min-width: auto;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🏠 네이버 부동산 크롤러</h1>
+        <div class="header">
+            <h1>
+                <i class="fas fa-home icon"></i>
+                네이버 부동산 크롤러
+            </h1>
+            <p>단지명을 입력하면 상세 정보와 매물을 한 번에 확인할 수 있습니다</p>
+        </div>
         
         <div class="form-group">
             <label for="complexName">단지명을 입력하세요:</label>
-            <input type="text" id="complexName" placeholder="예: 반포자이, 잠실리센츠" />
+            <div class="input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="complexName" placeholder="예: 반포자이, 잠실리센츠" />
+            </div>
         </div>
         
         <div class="form-group">
-            <button onclick="searchComplex()">단지 검색</button>
-            <button onclick="searchComplexWithProperties()">단지 + 매물 정보 검색</button>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="searchComplex()">
+                    <i class="fas fa-search"></i>
+                    단지 검색
+                </button>
+                <button class="btn btn-secondary" onclick="searchComplexWithProperties()">
+                    <i class="fas fa-home"></i>
+                    단지 + 매물 정보 검색
+                </button>
+            </div>
         </div>
         
-        <div id="result" class="result" style="display: none;"></div>
+        <div id="result" class="result"></div>
         
         <div class="api-info">
-            <h3>📋 API 엔드포인트</h3>
+            <h3>
+                <i class="fas fa-code"></i>
+                API 엔드포인트
+            </h3>
             <ul>
                 <li><strong>GET /api/complex?name=단지명</strong> - 단지 검색</li>
                 <li><strong>GET /api/complex/properties?name=단지명</strong> - 단지 검색 + 매물 정보</li>
@@ -317,7 +538,7 @@
             const resultDiv = document.getElementById('result');
             resultDiv.style.display = 'block';
             resultDiv.className = 'result loading';
-            resultDiv.innerHTML = `<div>${message}</div>`;
+            resultDiv.innerHTML = `<div><i class="fas fa-spinner"></i>${message}</div>`;
         }
 
         function displayComplexResult(data) {
@@ -327,20 +548,19 @@
             
             if (data) {
                 resultDiv.innerHTML = `
-                    <h3>✅ 검색 결과</h3>
+                    <h3><i class="fas fa-check-circle" style="color: #27ae60;"></i> 검색 결과</h3>
                     <div class="complex-info">
                         <strong>단지명:</strong> ${data.name || 'N/A'}<br>
                         <strong>Complex No:</strong> ${data.complexNo || 'N/A'}
                     </div>
-                    <h4>📄 전체 응답 데이터:</h4>
+                    <h4><i class="fas fa-code"></i> 전체 응답 데이터:</h4>
                     <pre>${JSON.stringify(data, null, 2)}</pre>
                 `;
             } else {
-                resultDiv.innerHTML = '<div class="error">검색 결과가 없습니다.</div>';
+                resultDiv.innerHTML = '<div class="error"><i class="fas fa-exclamation-triangle"></i> 검색 결과가 없습니다.</div>';
             }
         }
 
-        // 필터 버튼 클릭 시 매물 필터링
         function setupFilterButtons() {
             const filterButtons = document.querySelectorAll('.filter-btn');
             const propertyList = document.getElementById('propertyList');
@@ -359,7 +579,6 @@
                             }
                         });
 
-                        // 활성화된 버튼 표시
                         filterButtons.forEach(btn => btn.classList.remove('active'));
                         this.classList.add('active');
                     });
@@ -367,7 +586,6 @@
             }
         }
 
-        // 매물 정보 표시 후 필터 버튼 설정
         function displayPropertyResult(data) {
             const resultDiv = document.getElementById('result');
             resultDiv.style.display = 'block';
@@ -375,7 +593,7 @@
             
             if (data && data.complexInfo) {
                 let html = `
-                    <h3>✅ 검색 결과</h3>
+                    <h3><i class="fas fa-check-circle" style="color: #27ae60;"></i> 검색 결과</h3>
                     <div class="complex-info">
                         <strong>검색 키워드:</strong> ${data.searchKeyword}<br>
                         <strong>단지명:</strong> ${data.complexInfo.name || 'N/A'}<br>
@@ -384,13 +602,12 @@
                 `;
 
                 if (data.propertyInfo) {
-                    // 단지 상세 정보 표시 (접을 수 있게)
                     const complexInfo = data.propertyInfo.complexInfo;
                     if (complexInfo) {
                         html += `
                             <div class="collapsible-section">
                                 <div class="collapsible-header" onclick="toggleCollapsible('complexSection')">
-                                    <span>🏠 단지 상세 정보</span>
+                                    <span><i class="fas fa-building"></i> 단지 상세 정보</span>
                                     <span class="collapse-btn">펼치기</span>
                                 </div>
                                 <div class="collapsible-content show" id="complexSection">
@@ -417,10 +634,8 @@
                         `;
                     }
 
-                    // 가격 정보 표시 (접을 수 있게)
                     if (complexInfo.prices && complexInfo.prices.length > 0) {
-                        // 가격 정보 요약
-                        const uniquePrices = [...new Set(complexInfo.prices)].slice(0, 5); // 중복 제거하고 처음 5개만
+                        const uniquePrices = [...new Set(complexInfo.prices)].slice(0, 5);
                         const priceSummary = uniquePrices.length > 5 ? 
                             `${uniquePrices.length}개의 가격 정보 (처음 5개 표시)` : 
                             `${uniquePrices.length}개의 가격 정보`;
@@ -428,19 +643,19 @@
                         html += `
                             <div class="collapsible-section">
                                 <div class="collapsible-header" onclick="toggleCollapsible('priceSection')">
-                                    <span>💰 가격 정보 (${complexInfo.prices.length}개)</span>
+                                    <span><i class="fas fa-dollar-sign"></i> 가격 정보 (${complexInfo.prices.length}개)</span>
                                     <span class="collapse-btn">펼치기</span>
                                 </div>
                                 <div class="collapsible-content" id="priceSection">
                                     <div class="price-summary">
-                                        <h5>📊 가격 요약</h5>
+                                        <h5><i class="fas fa-chart-bar"></i> 가격 요약</h5>
                                         <ul>
                                             ${uniquePrices.map(price => `<li>${price}</li>`).join('')}
                                         </ul>
                                         ${complexInfo.prices.length > 5 ? `<p><em>... 외 ${complexInfo.prices.length - 5}개 더</em></p>` : ''}
                                     </div>
                                     <div class="price-info">
-                                        <h5>📋 전체 가격 정보</h5>
+                                        <h5><i class="fas fa-list"></i> 전체 가격 정보</h5>
                                         <ul>
                                             ${complexInfo.prices.map(price => `<li>${price}</li>`).join('')}
                                         </ul>
@@ -450,7 +665,6 @@
                         `;
                     }
 
-                    // 매물 정보 표시 (접을 수 있게)
                     if (data.propertyInfo.properties && data.propertyInfo.properties.length > 0) {
                         const properties = data.propertyInfo.properties;
                         const 매매Count = properties.filter(p => p.type === '매매').length;
@@ -460,7 +674,7 @@
                         html += `
                             <div class="collapsible-section">
                                 <div class="collapsible-header" onclick="toggleCollapsible('propertySection')">
-                                    <span>📋 매물 정보 (${properties.length}개)</span>
+                                    <span><i class="fas fa-list-alt"></i> 매물 정보 (${properties.length}개)</span>
                                     <span class="collapse-btn">펼치기</span>
                                 </div>
                                 <div class="collapsible-content show" id="propertySection">
@@ -477,7 +691,7 @@
                             const propertyType = property.type || '기타';
                             html += `
                                 <div class="property-item" data-type="${propertyType}">
-                                    <h5>매물 ${index + 1}</h5>
+                                    <h5><i class="fas fa-home"></i> 매물 ${index + 1}</h5>
                                     <table class="property-table">
                                         <tr><td><strong>제목:</strong></td><td>${property.title || 'N/A'}</td></tr>
                                         <tr><td><strong>가격:</strong></td><td>${property.price || 'N/A'}</td></tr>
@@ -497,12 +711,11 @@
 
                 resultDiv.innerHTML = html;
                 
-                // 매물 정보가 로드된 후 필터 버튼 설정
                 setTimeout(() => {
                     setupFilterButtons();
                 }, 100);
             } else {
-                resultDiv.innerHTML = '<div class="error">검색 결과가 없습니다.</div>';
+                resultDiv.innerHTML = '<div class="error"><i class="fas fa-exclamation-triangle"></i> 검색 결과가 없습니다.</div>';
             }
         }
 
@@ -510,10 +723,9 @@
             const resultDiv = document.getElementById('result');
             resultDiv.style.display = 'block';
             resultDiv.className = 'result error';
-            resultDiv.innerHTML = `<h3>❌ 오류</h3><div>${message}</div>`;
+            resultDiv.innerHTML = `<h3><i class="fas fa-exclamation-triangle"></i> 오류</h3><div>${message}</div>`;
         }
 
-        // 접기/펼치기 토글 함수
         function toggleCollapsible(sectionId) {
             const content = document.getElementById(sectionId);
             const header = content.previousElementSibling;
@@ -528,17 +740,11 @@
             }
         }
 
-        // Enter 키로 검색 실행
         document.getElementById('complexName').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 searchComplexWithProperties();
             }
         });
-
-        // 필터 버튼 클릭 시 매물 필터링
-        // document.addEventListener('DOMContentLoaded', function() {
-        //     setupFilterButtons();
-        // });
     </script>
 </body>
 </html> 
