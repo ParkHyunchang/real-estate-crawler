@@ -383,6 +383,42 @@ async function getComplexPropertyInfo(complexNo) {
         data.complexInfo.name = complexNameElement.textContent.trim();
       }
 
+      // 페이지 전체 텍스트에서 정보 추출
+      const pageText = document.body.innerText;
+      
+      // 세대수 정보 추출
+      const householdMatch = pageText.match(/총\s*(\d+)\s*세대/);
+      if (householdMatch) {
+        data.complexInfo.totalHouseholds = householdMatch[1];
+      }
+
+      // 건물 수 정보 추출
+      const buildingMatch = pageText.match(/총\s*(\d+)\s*동/);
+      if (buildingMatch) {
+        data.complexInfo.totalBuildings = buildingMatch[1];
+      }
+
+      // 건축년도 정보 추출
+      const yearMatch = pageText.match(/(\d{4})\.(\d{2})\.(\d{2})/);
+      if (yearMatch) {
+        data.complexInfo.constructionDate = `${yearMatch[1]}-${yearMatch[2]}-${yearMatch[3]}`;
+      }
+
+      // 면적 정보 추출
+      const areaMatch = pageText.match(/(\d+\.?\d*)\s*m²/);
+      if (areaMatch) {
+        data.complexInfo.area = areaMatch[1];
+      }
+
+      // 위치 정보 추출 (주소)
+      const addressElements = document.querySelectorAll('[class*="address"], [class*="location"], [class*="addr"]');
+      addressElements.forEach(el => {
+        const text = el.textContent.trim();
+        if (text.includes('시') || text.includes('구') || text.includes('동')) {
+          data.complexInfo.address = text;
+        }
+      });
+
       // 가격 정보 스크래핑
       const priceElements = document.querySelectorAll('[class*="price"], [class*="Price"]');
       priceElements.forEach(el => {
@@ -393,14 +429,74 @@ async function getComplexPropertyInfo(complexNo) {
         }
       });
 
+      // 단지 상세 정보 스크래핑
+      const detailSelectors = [
+        '.complex_info',
+        '.complex-info',
+        '.detail_info',
+        '.detail-info',
+        '[class*="info"]',
+        '[class*="detail"]'
+      ];
+
+      detailSelectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+          const text = el.textContent.trim();
+          
+          // 세대수 패턴
+          const householdPattern = /(\d+)\s*세대/;
+          const householdMatch = text.match(householdPattern);
+          if (householdMatch && !data.complexInfo.totalHouseholds) {
+            data.complexInfo.totalHouseholds = householdMatch[1];
+          }
+
+          // 건물수 패턴
+          const buildingPattern = /(\d+)\s*동/;
+          const buildingMatch = text.match(buildingPattern);
+          if (buildingMatch && !data.complexInfo.totalBuildings) {
+            data.complexInfo.totalBuildings = buildingMatch[1];
+          }
+
+          // 건축년도 패턴
+          const yearPattern = /(\d{4})\.(\d{2})\.(\d{2})/;
+          const yearMatch = text.match(yearPattern);
+          if (yearMatch && !data.complexInfo.constructionDate) {
+            data.complexInfo.constructionDate = `${yearMatch[1]}-${yearMatch[2]}-${yearMatch[3]}`;
+          }
+
+          // 면적 패턴
+          const areaPattern = /(\d+\.?\d*)\s*m²/;
+          const areaMatch = text.match(areaPattern);
+          if (areaMatch && !data.complexInfo.area) {
+            data.complexInfo.area = areaMatch[1];
+          }
+
+          // 주소 패턴
+          if ((text.includes('시') || text.includes('구') || text.includes('동')) && !data.complexInfo.address) {
+            data.complexInfo.address = text;
+          }
+        });
+      });
+
       // 매물 정보 스크래핑
       const propertyElements = document.querySelectorAll('[class*="item"], [class*="property"], [class*="listing"]');
-      propertyElements.forEach(el => {
+      console.log(`총 ${propertyElements.length}개의 매물 요소 발견`);
+      
+      propertyElements.forEach((el, index) => {
         const property = {
           title: '',
           price: '',
-          details: ''
+          details: '',
+          area: '',
+          floor: '',
+          direction: '',
+          type: ''
         };
+
+        // 전체 텍스트 가져오기
+        const fullText = el.textContent.trim();
+        console.log(`매물 ${index + 1} 전체 텍스트:`, fullText);
 
         // 제목 찾기
         const titleEl = el.querySelector('h3, h4, .title, .name');
@@ -420,26 +516,146 @@ async function getComplexPropertyInfo(complexNo) {
           property.details = detailEl.textContent.trim();
         }
 
+        // 면적 정보 추출
+        const areaMatch = fullText.match(/(\d+\.?\d*)\s*m²/);
+        if (areaMatch) {
+          property.area = areaMatch[1];
+        }
+
+        // 층수 정보 추출
+        const floorMatch = fullText.match(/(\d+)\s*층/);
+        if (floorMatch) {
+          property.floor = floorMatch[1];
+        }
+
+        // 방향 정보 추출
+        const directionMatch = fullText.match(/(남향|북향|동향|서향|남동향|남서향|북동향|북서향)/);
+        if (directionMatch) {
+          property.direction = directionMatch[1];
+        }
+
+        // 매물 타입 추출 - 더 정확한 방법
+        let typeFound = false;
+        
+        // 1. 전체 텍스트에서 타입 찾기 (가장 우선)
+        const fullTypeMatch = fullText.match(/(매매|전세|월세|분양)/);
+        if (fullTypeMatch) {
+          property.type = fullTypeMatch[1];
+          typeFound = true;
+          console.log(`매물 ${index + 1} 타입 발견 (전체 텍스트):`, property.type);
+        }
+
+        // 2. 가격에서 타입 찾기
+        if (!typeFound && property.price) {
+          const priceTypeMatch = property.price.match(/(매매|전세|월세|분양)/);
+          if (priceTypeMatch) {
+            property.type = priceTypeMatch[1];
+            typeFound = true;
+            console.log(`매물 ${index + 1} 타입 발견 (가격):`, property.type);
+          }
+        }
+
+        // 3. 제목에서 타입 찾기
+        if (!typeFound && property.title) {
+          const titleTypeMatch = property.title.match(/(매매|전세|월세|분양)/);
+          if (titleTypeMatch) {
+            property.type = titleTypeMatch[1];
+            typeFound = true;
+            console.log(`매물 ${index + 1} 타입 발견 (제목):`, property.type);
+          }
+        }
+
+        // 4. 상세정보에서 타입 찾기
+        if (!typeFound && property.details) {
+          const detailTypeMatch = property.details.match(/(매매|전세|월세|분양)/);
+          if (detailTypeMatch) {
+            property.type = detailTypeMatch[1];
+            typeFound = true;
+            console.log(`매물 ${index + 1} 타입 발견 (상세정보):`, property.type);
+          }
+        }
+
+        // 5. 가격 패턴으로 타입 추정 (더 정확한 패턴)
+        if (!typeFound && property.price) {
+          const priceText = property.price.toLowerCase();
+          console.log(`매물 ${index + 1} 가격 패턴 분석:`, priceText);
+          
+          // 전세 패턴 확인
+          if (priceText.includes('전세')) {
+            property.type = '전세';
+            typeFound = true;
+            console.log(`매물 ${index + 1} 전세로 분류`);
+          }
+          // 월세 패턴 확인 (슬래시가 있거나 월세가 포함된 경우)
+          else if (priceText.includes('월세') || priceText.includes('/')) {
+            property.type = '월세';
+            typeFound = true;
+            console.log(`매물 ${index + 1} 월세로 분류`);
+          }
+          // 매매 패턴 확인
+          else if (priceText.includes('매매') || (priceText.includes('억') && !priceText.includes('월세'))) {
+            property.type = '매매';
+            typeFound = true;
+            console.log(`매물 ${index + 1} 매매로 분류`);
+          }
+          // 분양 패턴 확인
+          else if (priceText.includes('분양')) {
+            property.type = '분양';
+            typeFound = true;
+            console.log(`매물 ${index + 1} 분양으로 분류`);
+          }
+        }
+
+        // 타입이 찾아지지 않은 경우 기본값 설정
+        if (!typeFound) {
+          property.type = '기타';
+          console.log(`매물 ${index + 1} 타입을 찾을 수 없음, 기본값 설정`);
+        }
+
+        // 최종 매물 정보 로그
+        console.log(`매물 ${index + 1} 최종 정보:`, {
+          title: property.title,
+          price: property.price,
+          type: property.type,
+          details: property.details
+        });
+
         if (property.title || property.price) {
           data.properties.push(property);
         }
       });
 
-      // 페이지 전체 텍스트에서 정보 추출
-      const pageText = document.body.innerText;
-      
-      // 단지 정보 패턴 찾기
+      // 추가 단지 정보 패턴 찾기
       const complexPatterns = [
-        /총\s*(\d+)세대/,
-        /(\d+)동/,
-        /(\d{4}\.\d{2}\.\d{2})/,
-        /(\d+\.\d+)m²/
+        { pattern: /총\s*(\d+)세대/, key: 'totalHouseholds' },
+        { pattern: /(\d+)동/, key: 'totalBuildings' },
+        { pattern: /(\d{4}\.\d{2}\.\d{2})/, key: 'constructionDate' },
+        { pattern: /(\d+\.\d+)m²/, key: 'area' },
+        { pattern: /(\d+)층/, key: 'totalFloors' },
+        { pattern: /(\d+)개/, key: 'totalUnits' }
       ];
 
-      complexPatterns.forEach(pattern => {
+      complexPatterns.forEach(({ pattern, key }) => {
+        const match = pageText.match(pattern);
+        if (match && !data.complexInfo[key]) {
+          data.complexInfo[key] = match[1];
+        }
+      });
+
+      // 특별한 정보 추출
+      const specialInfo = {
+        parking: /주차\s*(\d+)대/,
+        elevator: /엘리베이터\s*(\d+)대/,
+        heating: /난방\s*([가-힣]+)/,
+        structure: /구조\s*([가-힣]+)/,
+        developer: /시행사\s*([가-힣]+)/,
+        constructor: /시공사\s*([가-힣]+)/
+      };
+
+      Object.entries(specialInfo).forEach(([key, pattern]) => {
         const match = pageText.match(pattern);
         if (match) {
-          data.complexInfo[pattern.source] = match[1];
+          data.complexInfo[key] = match[1];
         }
       });
 
