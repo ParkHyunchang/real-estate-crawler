@@ -596,10 +596,19 @@
                     <h3><i class="fas fa-check-circle" style="color: #27ae60;"></i> 검색 결과</h3>
                     <div class="complex-info">
                         <strong>검색 키워드:</strong> ${data.searchKeyword}<br>
-                        <strong>단지명:</strong> ${data.complexInfo.name || 'N/A'}<br>
+                        <!-- <strong>단지명:</strong> ${data.complexInfo.name || 'N/A'}<br> -->
                         <strong>Complex No:</strong> ${data.complexInfo.complexNo || 'N/A'}
                     </div>
                 `;
+
+                // 단지 상세 정보가 있으면 주소 정보를 상단에 표시
+                if (data.propertyInfo && data.propertyInfo.complexInfo && data.propertyInfo.complexInfo.address) {
+                    html += `
+                        <div class="complex-info" style="background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); border: 1px solid #a5d6a7;">
+                            <strong><i class="fas fa-map-marker-alt"></i> 주소:</strong> ${data.propertyInfo.complexInfo.address}
+                        </div>
+                    `;
+                }
 
                 if (data.propertyInfo) {
                     const complexInfo = data.propertyInfo.complexInfo;
@@ -608,25 +617,24 @@
                             <div class="collapsible-section">
                                 <div class="collapsible-header" onclick="toggleCollapsible('complexSection')">
                                     <span><i class="fas fa-building"></i> 단지 상세 정보</span>
-                                    <span class="collapse-btn">펼치기</span>
+                                    <span class="collapse-btn">접기</span>
                                 </div>
                                 <div class="collapsible-content show" id="complexSection">
                                     <div class="complex-details">
                                         <table class="info-table">
                                             <tr><td><strong>단지명:</strong></td><td>${complexInfo.name || 'N/A'}</td></tr>
+                                            <tr style="background: #f8f9fa;"><td><strong><i class="fas fa-map-marker-alt"></i> 주소:</strong></td><td style="font-weight: 600; color: #2e7d32;">${complexInfo.address || 'N/A'}</td></tr>
                                             <tr><td><strong>총 세대수:</strong></td><td>${complexInfo.totalHouseholds ? complexInfo.totalHouseholds + '세대' : 'N/A'}</td></tr>
                                             <tr><td><strong>총 건물수:</strong></td><td>${complexInfo.totalBuildings ? complexInfo.totalBuildings + '동' : 'N/A'}</td></tr>
                                             <tr><td><strong>건축년도:</strong></td><td>${complexInfo.constructionDate || 'N/A'}</td></tr>
                                             <tr><td><strong>면적:</strong></td><td>${complexInfo.area ? complexInfo.area + 'm²' : 'N/A'}</td></tr>
-                                            <tr><td><strong>주소:</strong></td><td>${complexInfo.address || 'N/A'}</td></tr>
                                             <tr><td><strong>총 층수:</strong></td><td>${complexInfo.totalFloors ? complexInfo.totalFloors + '층' : 'N/A'}</td></tr>
-                                            <tr><td><strong>총 세대수:</strong></td><td>${complexInfo.totalUnits ? complexInfo.totalUnits + '개' : 'N/A'}</td></tr>
                                             <tr><td><strong>주차:</strong></td><td>${complexInfo.parking ? complexInfo.parking + '대' : 'N/A'}</td></tr>
                                             <tr><td><strong>엘리베이터:</strong></td><td>${complexInfo.elevator ? complexInfo.elevator + '대' : 'N/A'}</td></tr>
                                             <tr><td><strong>난방:</strong></td><td>${complexInfo.heating || 'N/A'}</td></tr>
                                             <tr><td><strong>구조:</strong></td><td>${complexInfo.structure || 'N/A'}</td></tr>
                                             <tr><td><strong>시행사:</strong></td><td>${complexInfo.developer || 'N/A'}</td></tr>
-                                            <tr><td><strong>시공사:</strong></td><td>${complexInfo.constructor || 'N/A'}</td></tr>
+                                            <tr><td><strong>시공사:</strong></td><td>${typeof complexInfo.constructor === 'object' ? 'N/A' : (complexInfo.constructor || 'N/A')}</td></tr>
                                         </table>
                                     </div>
                                 </div>
@@ -675,7 +683,7 @@
                             <div class="collapsible-section">
                                 <div class="collapsible-header" onclick="toggleCollapsible('propertySection')">
                                     <span><i class="fas fa-list-alt"></i> 매물 정보 (${properties.length}개)</span>
-                                    <span class="collapse-btn">펼치기</span>
+                                    <span class="collapse-btn">접기</span>
                                 </div>
                                 <div class="collapsible-content show" id="propertySection">
                                     <div class="filter-buttons">
