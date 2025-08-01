@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>네이버 부동산 크롤러</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .error {
+            border-left-color: #e74c3c;
+            background-color: #fdf2f2;
+        }
+        .loading {
+            text-align: center;
+            color: #7f8c8d;
+        }
+        .property-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .complex-info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .api-info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 네이버 부동산 크롤러</h1>
+        
+        <div class="form-group">
+            <label for="complexName">단지명을 입력하세요:</label>
+            <input type="text" id="complexName" placeholder="예: 반포자이, 잠실리센츠" />
+        </div>
+        
+        <div class="form-group">
+            <button onclick="searchComplex()">단지 검색</button>
+            <button onclick="searchComplexWithProperties()">단지 + 매물 정보 검색</button>
+        </div>
+        
+        <div id="result" class="result" style="display: none;"></div>
+        
+        <div class="api-info">
+            <h3>📋 API 엔드포인트</h3>
+            <ul>
+                <li><strong>GET /api/complex?name=단지명</strong> - 단지 검색</li>
+                <li><strong>GET /api/complex/properties?name=단지명</strong> - 단지 검색 + 매물 정보</li>
+                <li><strong>POST /api/complex/properties</strong> - 단지 검색 + 매물 정보 (POST)</li>
+                <li><strong>GET /api/complex/:complexNo/properties</strong> - 단지 번호로 매물 정보 조회</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        async function searchComplex() {
+            const complexName = document.getElementById('complexName').value.trim();
+            if (!complexName) {
+                alert('단지명을 입력해주세요.');
+                return;
+            }
+
+            showLoading('단지 검색 중...');
+            
+            try {
+                const response = await fetch(`/api/complex?name=${encodeURIComponent(complexName)}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayComplexResult(data);
+                } else {
+                    displayError(data.error);
+                }
+            } catch (error) {
+                displayError('서버 연결 오류: ' + error.message);
+            }
+        }
+
+        async function searchComplexWithProperties() {
+            const complexName = document.getElementById('complexName').value.trim();
+            if (!complexName) {
+                alert('단지명을 입력해주세요.');
+                return;
+            }
+
+            showLoading('단지 및 매물 정보 검색 중...');
+            
+            try {
+                const response = await fetch(`/api/complex/properties?name=${encodeURIComponent(complexName)}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayPropertyResult(data);
+                } else {
+                    displayError(data.error);
+                }
+            } catch (error) {
+                displayError('서버 연결 오류: ' + error.message);
+            }
+        }
+
+        function showLoading(message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.innerHTML = `<div>${message}</div>`;
+        }
+
+        function displayComplexResult(data) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            
+            if (data) {
+                resultDiv.innerHTML = `
+                    <h3>✅ 검색 결과</h3>
+                    <div class="complex-info">
+                        <strong>단지명:</strong> ${data.name || 'N/A'}<br>
+                        <strong>Complex No:</strong> ${data.complexNo || 'N/A'}
+                    </div>
+                    <h4>📄 전체 응답 데이터:</h4>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.innerHTML = '<div class="error">검색 결과가 없습니다.</div>';
+            }
+        }
+
+        function displayPropertyResult(data) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            
+            if (data && data.complexInfo) {
+                let html = `
+                    <h3>✅ 검색 결과</h3>
+                    <div class="complex-info">
+                        <strong>검색 키워드:</strong> ${data.searchKeyword}<br>
+                        <strong>단지명:</strong> ${data.complexInfo.name || 'N/A'}<br>
+                        <strong>Complex No:</strong> ${data.complexInfo.complexNo || 'N/A'}
+                    </div>
+                `;
+
+                if (data.propertyInfo) {
+                    html += `
+                        <h4>🏠 단지 정보</h4>
+                        <pre>${JSON.stringify(data.propertyInfo.complexInfo, null, 2)}</pre>
+                        
+                        <h4>📋 매물 정보</h4>
+                        <pre>${JSON.stringify(data.propertyInfo.properties, null, 2)}</pre>
+                    `;
+                }
+
+                resultDiv.innerHTML = html;
+            } else {
+                resultDiv.innerHTML = '<div class="error">검색 결과가 없습니다.</div>';
+            }
+        }
+
+        function displayError(message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result error';
+            resultDiv.innerHTML = `<h3>❌ 오류</h3><div>${message}</div>`;
+        }
+
+        // Enter 키로 검색 실행
+        document.getElementById('complexName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchComplexWithProperties();
+            }
+        });
+    </script>
+</body>
+</html> 
